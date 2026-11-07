@@ -83,6 +83,10 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
 - **Área tratada** começa igual à área do setor ("Toda a exploração" = soma das áreas).
 - **Números com ponto**: um único ponto é decimal ("1.25" = 1,25); vários pontos são milhares ("1.234.567").
 - **CSV geral** usa as mesmas colunas do CSV de importação da app anterior (simétrico com a etapa 6).
+- **Intervalo de segurança a decorrer**: pode colher a partir de data + IS + 1 dia; está a decorrer enquanto hoje < essa data.
+  Por setor vale a data mais tardia; um tratamento em «Toda a exploração» conta para todos os setores (`lib/intervaloSeguranca.ts`).
+- **Indicadores**: kg colhidos = registos de Colheita; m³ = registos de Rega; custo/ha = custos lançados ÷ área total dos setores.
+- **Formulários genéricos**: `lib/formulario.ts` (definições + conversão texto↔valores) e `componentes/CamposFormulario.tsx`.
 - **Git**: commit + `git push -u origin master` no fim de cada etapa.
 - **Verificação manual**: `npm run build && npm run preview` e abrir no browser (o service worker só existe no build).
 
@@ -95,7 +99,7 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
 ## Estado das etapas
 1. [x] Projeto base, CLAUDE.md, git, PWA, navegação, camada de dados e backup JSON
 2. [x] Setores e Caderno de campo, com testes
-3. [ ] Resumo da campanha, testes do intervalo de segurança
+3. [x] Resumo da campanha, testes do intervalo de segurança
 4. [ ] Solo e água, dados iniciais e gráficos
 5. [ ] Vendas e Clima
 6. [ ] Importação CSV, revisão, build, README

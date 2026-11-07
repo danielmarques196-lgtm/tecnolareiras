@@ -694,3 +694,22 @@ details.cartao[open] > summary {
     margin: 10mm;
   }
 }
+
+.etiqueta-perigo {
+  background: var(--perigo-suave);
+  color: var(--perigo);
+  font-weight: 700;
+}
+.etiqueta-ok {
+  background: var(--verde-suave);
+  color: var(--verde);
+  font-weight: 700;
+}
+.etiqueta-aviso {
+  background: var(--aviso-suave);
+  color: var(--aviso);
+  font-weight: 700;
+}
+.cabecalho .campo {
+  margin-bottom: 0;
+}

@@ -8,21 +8,9 @@ import {
   type Registo,
   type TipoRegisto,
 } from '../dados/modelo';
-import { lerNumero } from './formatos';
+import { formParaObjeto, formVazio, objetoParaForm, validarForm, type DefCampo, type ValoresForm } from './formulario';
 
-export interface DefCampo {
-  chave: string;
-  rotulo: string;
-  tipo: 'texto' | 'numero' | 'opcoes' | 'textoLongo' | 'foto';
-  opcoes?: readonly string[];
-  unidade?: string;
-  obrigatorio?: boolean;
-  ajuda?: string;
-  /** Campos com o mesmo `grupo` ficam lado a lado. */
-  grupo?: string;
-  /** Lembrar o último valor usado (pré-preencher em novos registos). */
-  lembrar?: boolean;
-}
+export type { DefCampo };
 
 export const CAMPOS: Record<TipoRegisto, DefCampo[]> = {
   tratamento: [
@@ -69,55 +57,17 @@ export const CAMPOS: Record<TipoRegisto, DefCampo[]> = {
 };
 
 /** Estado do formulário: todos os campos como texto (foto: data URL ou ''). */
-export type FormCampos = Record<string, string>;
+export type FormCampos = ValoresForm;
 
-/** Valores iniciais de um tipo (as opções começam na primeira). */
-export function camposVazios(tipo: TipoRegisto): FormCampos {
-  const f: FormCampos = {};
-  for (const c of CAMPOS[tipo]) f[c.chave] = c.tipo === 'opcoes' && c.obrigatorio ? (c.opcoes?.[0] ?? '') : '';
-  return f;
-}
+export const camposVazios = (tipo: TipoRegisto): FormCampos => formVazio(CAMPOS[tipo]);
 
 /** Dados guardados → texto do formulário (números com vírgula). */
-export function dadosParaForm(r: Registo): FormCampos {
-  const f = camposVazios(r.tipo);
-  const d = r.dados as unknown as Record<string, unknown>;
-  for (const c of CAMPOS[r.tipo]) {
-    const v = d[c.chave];
-    if (v === null || v === undefined) f[c.chave] = c.tipo === 'opcoes' ? f[c.chave] : '';
-    else if (typeof v === 'number') f[c.chave] = String(v).replace('.', ',');
-    else f[c.chave] = String(v);
-  }
-  return f;
-}
+export const dadosParaForm = (r: Registo): FormCampos =>
+  objetoParaForm(CAMPOS[r.tipo], r.dados as unknown as Record<string, unknown>);
 
 /** Texto do formulário → objeto de dados do tipo. */
-export function formParaDados(tipo: TipoRegisto, f: FormCampos): Registo['dados'] {
-  const d: Record<string, unknown> = {};
-  for (const c of CAMPOS[tipo]) {
-    const v = (f[c.chave] ?? '').trim();
-    if (c.tipo === 'numero') d[c.chave] = lerNumero(v);
-    else if (c.tipo === 'foto') d[c.chave] = v || null;
-    else d[c.chave] = v;
-  }
-  return d as unknown as Registo['dados'];
-}
+export const formParaDados = (tipo: TipoRegisto, f: FormCampos): Registo['dados'] =>
+  formParaObjeto(CAMPOS[tipo], f) as unknown as Registo['dados'];
 
 /** Erros de validação por campo (chave → mensagem). Vazio = válido. */
-export function validarCampos(tipo: TipoRegisto, f: FormCampos): Record<string, string> {
-  const erros: Record<string, string> = {};
-  for (const c of CAMPOS[tipo]) {
-    const v = (f[c.chave] ?? '').trim();
-    if (c.obrigatorio && v === '') {
-      erros[c.chave] = 'Campo obrigatório';
-      continue;
-    }
-    if (c.tipo === 'numero' && v !== '') {
-      const n = lerNumero(v);
-      if (n === null) erros[c.chave] = 'Número inválido';
-      else if (n < 0) erros[c.chave] = 'Não pode ser negativo';
-    }
-    if (c.tipo === 'opcoes' && v !== '' && c.opcoes && !c.opcoes.includes(v)) erros[c.chave] = 'Opção inválida';
-  }
-  return erros;
-}
+export const validarCampos = (tipo: TipoRegisto, f: FormCampos) => validarForm(CAMPOS[tipo], f);
