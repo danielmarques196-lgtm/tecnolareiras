@@ -483,3 +483,214 @@ th.num {
 .dialogo .botoes .botao {
   flex: 1;
 }
+
+.campo .unidade {
+  font-weight: 400;
+  color: var(--texto-suave);
+}
+.campo .erro {
+  font-size: 0.85rem;
+  color: var(--perigo);
+  font-weight: 600;
+}
+.campo.com-erro input,
+.campo.com-erro select,
+.campo.com-erro textarea {
+  border-color: var(--perigo);
+  border-width: 2px;
+}
+
+/* ---------- Cabeçalho de página com ação ---------- */
+.cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+.cabecalho h1 {
+  margin: 0.25rem 0;
+}
+
+/* ---------- Listas de cartões ---------- */
+.lista {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.item {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 12px 14px;
+}
+a.item {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+a.item:hover {
+  border-color: var(--primaria);
+}
+.item-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.item-titulo {
+  font-weight: 700;
+}
+.item-detalhe {
+  color: var(--texto-suave);
+  font-size: 0.92rem;
+}
+.item-detalhe + .item-detalhe {
+  margin-top: 2px;
+}
+
+/* tipos de registo (barra de cor à esquerda) */
+.tipo-tratamento { border-left: 5px solid #b3261e; }
+.tipo-adubacao { border-left: 5px solid #7b5b2c; }
+.tipo-rega { border-left: 5px solid #1f6fb2; }
+.tipo-operacao { border-left: 5px solid #5a8f3c; }
+.tipo-observacao { border-left: 5px solid #c77700; }
+.tipo-colheita { border-left: 5px solid #7a1f2b; }
+
+/* ---------- Botão flutuante (novo registo) ---------- */
+.botao-flutuante {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--nav-altura) + 16px + env(safe-area-inset-bottom));
+  z-index: 15;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 25%);
+}
+@media (min-width: 900px) {
+  .botao-flutuante {
+    bottom: 24px;
+    right: 32px;
+  }
+}
+
+/* ---------- Filtros ---------- */
+.filtros {
+  display: grid;
+  gap: 0 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.filtros .campo {
+  margin-bottom: 10px;
+}
+details.cartao > summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+details.cartao[open] > summary {
+  margin-bottom: 12px;
+}
+
+/* ---------- Escolha do tipo (botões grandes) ---------- */
+.escolha-tipo {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.escolha-tipo button {
+  min-height: 64px;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--raio);
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1px solid var(--borda);
+  cursor: pointer;
+}
+.escolha-tipo button.ativo {
+  outline: 3px solid var(--primaria);
+  background: var(--primaria-suave);
+}
+
+.foto-previa {
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: var(--raio);
+  display: block;
+  margin-bottom: 8px;
+}
+.miniatura {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  float: right;
+  margin-left: 8px;
+}
+
+/* ---------- Impressão (registo de tratamentos) ---------- */
+.so-imprimir {
+  display: none;
+}
+@media print {
+  .so-imprimir {
+    display: block;
+  }
+  .nav-lateral,
+  .nav-inferior,
+  .botao-flutuante,
+  .aviso-copia,
+  .nao-imprimir {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10pt;
+  }
+  .layout {
+    display: block;
+  }
+  .conteudo {
+    padding: 0;
+    max-width: none;
+  }
+  .cartao {
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+  .tabela-envolvente {
+    overflow: visible;
+  }
+  table {
+    font-size: 7pt;
+  }
+  th,
+  td {
+    border: 1px solid #999;
+    padding: 2px 3px;
+    color: #000;
+  }
+  td {
+    overflow-wrap: anywhere;
+  }
+  td.data {
+    white-space: nowrap;
+  }
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+}

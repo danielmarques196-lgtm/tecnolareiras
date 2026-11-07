@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { criarBackup, ErroBackup, importarBackupTexto, nomeFicheiroBackup } from '../dados/backup';
 import type { Tema } from '../dados/modelo';
 import { definicoes, useConsulta } from '../dados/repositorio';
+import Campo from '../componentes/Campo';
 import { useConfirmar } from '../componentes/Confirmar';
 import { descarregarFicheiro } from '../lib/descarregar';
 import { formatarDataHora } from '../lib/formatos';
@@ -95,6 +96,15 @@ export default function Definicoes() {
       </div>
 
       <div className="cartao">
+        <h2>Exploração</h2>
+        <p className="texto-suave">Aparece no cabeçalho do registo de tratamentos.</p>
+        <div className="linha-campos">
+          <CampoDefinicao chave="nomeExploracao" rotulo="Nome da exploração" valor={(defs.nomeExploracao as string) ?? 'Herdade da Coroa'} />
+          <CampoDefinicao chave="titular" rotulo="Titular (nome / NIF)" valor={(defs.titular as string) ?? ''} />
+        </div>
+      </div>
+
+      <div className="cartao">
         <h2>Aspeto</h2>
         <div className="segmentado" role="radiogroup" aria-label="Tema">
           {TEMAS.map((t) => (
@@ -112,5 +122,17 @@ export default function Definicoes() {
         </div>
       </div>
     </section>
+  );
+}
+
+/** Campo de texto que grava a definição ao sair do campo. */
+function CampoDefinicao({ chave, rotulo, valor }: { chave: string; rotulo: string; valor: string }) {
+  const [v, setV] = useState(valor);
+  return (
+    <Campo rotulo={rotulo}>
+      {(i) => (
+        <input id={i} value={v} onChange={(e) => setV(e.target.value)} onBlur={() => v !== valor && definicoes.gravar(chave, v.trim())} />
+      )}
+    </Campo>
   );
 }

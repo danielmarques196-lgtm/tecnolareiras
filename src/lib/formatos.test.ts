@@ -50,10 +50,20 @@ describe('números', () => {
     expect(lerNumero('5.81')).toBe(5.81);
     expect(lerNumero('1 234,5')).toBe(1234.5);
     expect(lerNumero('1.234,5')).toBe(1234.5);
-    expect(lerNumero('1.234')).toBe(1234);
+    expect(lerNumero('1.250')).toBe(1.25); // um ponto é decimal
+    expect(lerNumero('1.234.567')).toBe(1234567);
     expect(lerNumero('-2')).toBe(-2);
     expect(lerNumero('')).toBeNull();
     expect(lerNumero('abc')).toBeNull();
     expect(lerNumero(3)).toBe(3);
+  });
+});
+
+import { dimensoesAlvo } from './imagem';
+describe('fotografias', () => {
+  it('reduz mantendo a proporção e não amplia', () => {
+    expect(dimensoesAlvo(4000, 3000)).toEqual({ largura: 1280, altura: 960 });
+    expect(dimensoesAlvo(3000, 4000)).toEqual({ largura: 960, altura: 1280 });
+    expect(dimensoesAlvo(800, 600)).toEqual({ largura: 800, altura: 600 });
   });
 });

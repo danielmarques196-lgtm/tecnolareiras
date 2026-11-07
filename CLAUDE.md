@@ -23,13 +23,13 @@ src/
   estilos.css         estilos globais e temas
   dados/
     modelo.ts         tipos de dados (Setor, Registo, ...)
-    bd.ts             esquema Dexie (versões) — só o repositório o importa
+    bd.ts             esquema Dexie (versões) — só repositorio.ts e backup.ts o importam
     repositorio.ts    ÚNICA porta de acesso aos dados (CRUD, definições, seed, backup)
     backup.ts         exportar/importar JSON (formato versionado)
     seed.ts           dados iniciais, aplicados uma vez cada (passos numerados)
   lib/                lógica pura e testável (formatos, datas, cálculos, CSV)
   componentes/        componentes reutilizáveis (Navegacao, Confirmar, Aviso…)
-  paginas/            uma página por módulo (Resumo, Registos, Setores, SoloAgua, Vendas, Clima, Definicoes)
+  paginas/            uma página por módulo (Resumo, Registos, EditarRegisto, RegistoTratamentos, Setores, SoloAgua, Vendas, Clima, Definicoes)
 public/               ícones da PWA
 dados/                CSV a importar da app anterior (opcional, não versionado se tiver dados pessoais)
 ```
@@ -72,6 +72,18 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
 - **Formatação de milhares**: segue o `Intl` pt-PT, que só agrupa a partir de 5 dígitos (1234,50 € mas 12 345,50 €).
 - **`npm audit`**: avisos moderados/baixos em `glob`/`minimatch` vêm do `workbox-build` (só no build, não chegam ao browser).
   Não aplicar `npm audit fix --force` (faz downgrade do `vite-plugin-pwa`).
+- **Apagar setor com registos**: avisa quantos registos/análises/entregas tem; esses registos ficam e aparecem como «(setor apagado)».
+- **Registo obrigatório de tratamentos** (Lei n.º 26/2013): campos obrigatórios = produto comercial, n.º APV, substância ativa,
+  inimigo/alvo, dose + unidade, área tratada, aplicador, n.º de aplicador habilitado, equipamento (+ data e setor/cultura).
+  IS é opcional (nem todos os produtos têm). A quantidade total de produto é calculada (`quantidadeTotalProduto`).
+  Página «Registo de tratamentos» (`#/registos/tratamentos`): tabela por campanha, imprimir/PDF (A4 horizontal) e CSV.
+  Confirmar a lista de campos com a DRAP/DGAV se surgirem exigências novas.
+- **Campos por tipo**: definidos em `lib/camposRegisto.ts` (`CAMPOS`); o formulário é gerado a partir daí.
+  `lembrar: true` pré-preenche com o último registo do mesmo tipo (aplicador, n.º e equipamento).
+- **Área tratada** começa igual à área do setor ("Toda a exploração" = soma das áreas).
+- **Números com ponto**: um único ponto é decimal ("1.25" = 1,25); vários pontos são milhares ("1.234.567").
+- **CSV geral** usa as mesmas colunas do CSV de importação da app anterior (simétrico com a etapa 6).
+- **Git**: commit + `git push -u origin master` no fim de cada etapa.
 - **Verificação manual**: `npm run build && npm run preview` e abrir no browser (o service worker só existe no build).
 
 ## Preparar para o futuro (não implementado)
@@ -82,7 +94,7 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
 
 ## Estado das etapas
 1. [x] Projeto base, CLAUDE.md, git, PWA, navegação, camada de dados e backup JSON
-2. [ ] Setores e Caderno de campo, com testes
+2. [x] Setores e Caderno de campo, com testes
 3. [ ] Resumo da campanha, testes do intervalo de segurança
 4. [ ] Solo e água, dados iniciais e gráficos
 5. [ ] Vendas e Clima

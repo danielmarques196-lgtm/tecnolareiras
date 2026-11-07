@@ -62,7 +62,9 @@ export interface DadosTratamento {
   unidade: UnidadeDose;
   calda: number | null; // volume de calda (L/ha)
   is: number | null; // intervalo de segurança (dias)
+  areaTratada: number | null; // ha
   aplicador: string;
+  numAplicador: string; // n.º de habilitação / cartão de aplicador
   equipamento: string;
 }
 export interface DadosAdubacao {

@@ -61,18 +61,19 @@ export function formatarEuros(n: number | null | undefined): string {
 
 /**
  * Lê um número escrito por uma pessoa: aceita vírgula ou ponto decimal e espaços.
- * '1 234,5' → 1234.5; '1.234,5' → 1234.5; '' → null; texto inválido → null.
+ * '1 234,5' → 1234.5; '1.234,5' → 1234.5; '1.25' → 1.25; '' → null; texto inválido → null.
  */
 export function lerNumero(texto: string | number | null | undefined): number | null {
   if (texto === null || texto === undefined) return null;
   if (typeof texto === 'number') return Number.isFinite(texto) ? texto : null;
-  let t = texto.trim().replace(/[\s  ]/g, '');
+  let t = texto.trim().replace(/[\s\u00a0\u202f]/g, '');
   if (t === '') return null;
   if (t.includes(',')) {
     // vírgula é decimal; pontos antes dela são milhares
     t = t.replace(/\./g, '').replace(',', '.');
-  } else if (/^-?\d{1,3}(\.\d{3})+$/.test(t)) {
-    // '1.234' ou '1.234.567' sem vírgula → milhares
+  } else if (/^-?\d{1,3}(\.\d{3}){2,}$/.test(t)) {
+    // '1.234.567' (vários pontos) → milhares. Um só ponto é sempre decimal
+    // ('1.250' = 1,25): no teclado numérico do telemóvel o ponto faz de vírgula.
     t = t.replace(/\./g, '');
   }
   if (!/^-?\d*\.?\d+$/.test(t) && !/^-?\d+\.$/.test(t)) return null;
