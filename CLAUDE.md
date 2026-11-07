@@ -87,6 +87,12 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
   Por setor vale a data mais tardia; um tratamento em «Toda a exploração» conta para todos os setores (`lib/intervaloSeguranca.ts`).
 - **Indicadores**: kg colhidos = registos de Colheita; m³ = registos de Rega; custo/ha = custos lançados ÷ área total dos setores.
 - **Formulários genéricos**: `lib/formulario.ts` (definições + conversão texto↔valores) e `componentes/CamposFormulario.tsx`.
+- **Análises**: valores "<4" (abaixo do limite) e "n.d." guardam-se em `qualificadores` (chave do parâmetro → '<' | 'nd');
+  nos gráficos, '<' aparece como marcador oco no limite e 'n.d.' não aparece. Dados iniciais = passo 2 do seed.
+- **Interpretação**: textura USDA (nomes pt), classe de pH (LQARS), risco de entupimento Fe/Mn/pH (Nakayama & Bucks 1986)
+  e salinidade CE (Ayers & Westcot, FAO 29). Não interpretamos P/K/MO (as classes dependem do método do laboratório).
+- **Gráficos**: SVG próprio (`componentes/GraficoLinhas.tsx`, `lib/escala.ts`), sem biblioteca. Cores das séries
+  `--serie-1` (azul) e `--serie-2` (laranja), validadas para daltonismo e contraste nos dois temas.
 - **Git**: commit + `git push -u origin master` no fim de cada etapa.
 - **Verificação manual**: `npm run build && npm run preview` e abrir no browser (o service worker só existe no build).
 
@@ -100,6 +106,6 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
 1. [x] Projeto base, CLAUDE.md, git, PWA, navegação, camada de dados e backup JSON
 2. [x] Setores e Caderno de campo, com testes
 3. [x] Resumo da campanha, testes do intervalo de segurança
-4. [ ] Solo e água, dados iniciais e gráficos
+4. [x] Solo e água, dados iniciais e gráficos
 5. [ ] Vendas e Clima
 6. [ ] Importação CSV, revisão, build, README

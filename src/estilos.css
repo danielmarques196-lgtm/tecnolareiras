@@ -713,3 +713,123 @@ details.cartao[open] > summary {
 .cabecalho .campo {
   margin-bottom: 0;
 }
+
+/* ---------- Gráficos ---------- */
+:root {
+  --serie-1: #2a78d6;
+  --serie-2: #eb6834;
+}
+:root[data-tema='escuro'] {
+  --serie-1: #3987e5;
+  --serie-2: #d95926;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']):not([data-tema='escuro']) {
+    --serie-1: #3987e5;
+    --serie-2: #d95926;
+  }
+}
+.grafico {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  user-select: none;
+}
+.grafico svg {
+  display: block;
+  overflow: visible;
+}
+.grelha-linha {
+  stroke: var(--borda);
+  stroke-width: 1;
+}
+.limiar-linha {
+  stroke: var(--texto-suave);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+.crosshair {
+  stroke: var(--texto-suave);
+  stroke-width: 1;
+}
+.eixo-texto {
+  fill: var(--texto-suave);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.rotulo-serie {
+  fill: var(--texto);
+  font-size: 12px;
+  font-weight: 600;
+}
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  margin-bottom: 6px;
+}
+.legenda i,
+.tooltip i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  vertical-align: baseline;
+}
+.tooltip {
+  position: absolute;
+  top: 28px;
+  pointer-events: none;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 15%);
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Separadores ---------- */
+.separadores {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--borda);
+  margin-bottom: 16px;
+}
+.separadores button {
+  min-height: var(--toque);
+  padding: 0 18px;
+  font: inherit;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+.separadores button.ativo {
+  color: var(--primaria);
+  border-bottom-color: var(--primaria);
+}
+.valores {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 6px 12px;
+  margin: 8px 0 0;
+}
+.valores div {
+  font-size: 0.9rem;
+}
+.valores dt {
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+}
+.valores dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

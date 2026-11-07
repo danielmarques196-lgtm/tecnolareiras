@@ -9,6 +9,7 @@ import EditarRegisto from './paginas/EditarRegisto';
 import ListaRegistos from './paginas/Registos';
 import RegistoTratamentos from './paginas/RegistoTratamentos';
 import { EditarSetor, ListaSetores } from './paginas/Setores';
+import SoloAgua, { EditarAnalise } from './paginas/SoloAgua';
 import Resumo from './paginas/Resumo';
 
 export default function App() {
@@ -27,7 +28,8 @@ export default function App() {
               <Route path="/registos/:id" element={<EditarRegisto />} />
               <Route path="/setores" element={<ListaSetores />} />
               <Route path="/setores/:id" element={<EditarSetor />} />
-              <Route path="/solo-agua" element={<EmConstrucao titulo="Solo e água" etapa={4} />} />
+              <Route path="/solo-agua" element={<SoloAgua />} />
+              <Route path="/solo-agua/:tipo/:id" element={<EditarAnalise />} />
               <Route path="/vendas" element={<EmConstrucao titulo="Vendas" etapa={5} />} />
               <Route path="/clima" element={<EmConstrucao titulo="Clima" etapa={5} />} />
               <Route path="/definicoes" element={<Definicoes />} />

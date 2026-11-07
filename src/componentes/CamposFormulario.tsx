@@ -70,6 +70,8 @@ function ControloCampo({
             );
           case 'numero':
             return <input id={i} inputMode="decimal" value={valor} onChange={mudar} />;
+          case 'data':
+            return <input id={i} type="date" value={valor} onChange={mudar} />;
           case 'textoLongo':
             return <textarea id={i} value={valor} onChange={mudar} />;
           default:

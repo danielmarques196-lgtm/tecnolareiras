@@ -65,3 +65,19 @@ describe('cópia de segurança', () => {
     expect(await setores.listar()).toHaveLength(1);
   });
 });
+
+describe('dados iniciais das análises', () => {
+  it('carrega a análise de solo do Setor 4+7 e as análises dos dois furos', async () => {
+    await inicializar();
+    const solo = await bd.analisesSolo.toArray();
+    expect(solo).toHaveLength(1);
+    const [s] = await setores.listar();
+    expect(solo[0]).toMatchObject({ setorId: s.id, boletim: '867', areia: 81, ph: 5.81, k: 102.26, ctc: 5.1, p: null, qualificadores: { p: 'nd' } });
+    const agua = await bd.analisesAgua.toArray();
+    expect(agua.map((a) => [a.boletim, a.fe, a.mn]).sort()).toEqual([
+      ['11869', 1.4, 0.28],
+      ['11870', 0.5, 0.43],
+    ]);
+    expect(agua[0]).toMatchObject({ data: '2025-09-03', laboratorio: 'A-Logos', nitratos: 4, qualificadores: { nitratos: '<' }, ecoli: 0 });
+  });
+});

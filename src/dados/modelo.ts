@@ -110,6 +110,12 @@ export type Registo =
   | (RegistoBase & { tipo: 'colheita'; dados: DadosColheita });
 
 // ---------- Módulo 4 — Solo e água ----------
+/**
+ * Resultados abaixo do limite: '<' = abaixo do limite de quantificação (o valor guarda o limite, ex. <4),
+ * 'nd' = não detetável (valor null). Chave = nome do parâmetro.
+ */
+export type Qualificadores = Partial<Record<string, '<' | 'nd'>>;
+
 export interface Furo extends Base {
   nome: string;
   notas: string;
@@ -140,6 +146,7 @@ export interface AnaliseSolo extends Base {
   zn: number | null;
   cu: number | null;
   b: number | null;
+  qualificadores: Qualificadores;
   notas: string;
 }
 
@@ -153,9 +160,9 @@ export interface AnaliseAgua extends Base {
   fe: number | null; // mg/L
   mn: number | null; // mg/L
   nitratos: number | null; // mg/L
-  nitratosAbaixoLQ: boolean; // "<LQ" (ex. <4 mg/L): nitratos guarda o limite
   ecoli: number | null; // UFC/100 mL
   coliformes: number | null; // UFC/100 mL
+  qualificadores: Qualificadores;
   notas: string;
 }
 
