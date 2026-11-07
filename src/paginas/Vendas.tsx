@@ -45,7 +45,7 @@ export default function Vendas() {
         </div>
         <div className="indicador">
           <div className="valor">{formatarEuros(total.receita)}</div>
-          <div className="rotulo">receita{total.precoMedio !== null && ` · ${formatarNumero(total.precoMedio, 3)} €/kg`}</div>
+          <div className="rotulo">receita{total.precoMedio !== null && ` · ${formatarNumero(total.precoMedio, 3, 3)} €/kg`}</div>
         </div>
         <div className="indicador">
           <div className="valor">{formatarEuros(total.custos)}</div>
@@ -60,7 +60,7 @@ export default function Vendas() {
           <div className="rotulo">margem por hectare</div>
         </div>
         <div className="indicador">
-          <div className="valor">{total.margemKg === null ? '—' : `${formatarNumero(total.margemKg, 3)} €`}</div>
+          <div className="valor">{total.margemKg === null ? '—' : `${formatarNumero(total.margemKg, 3, 3)} €`}</div>
           <div className="rotulo">margem por kg</div>
         </div>
       </div>
@@ -90,7 +90,7 @@ export default function Vendas() {
                     <td className="num">{formatarEuros(t.custos)}</td>
                     <td className="num">{formatarEuros(t.margem)}</td>
                     <td className="num">{euros(t.margemHa)}</td>
-                    <td className="num">{t.margemKg === null ? '—' : formatarNumero(t.margemKg, 3)}</td>
+                    <td className="num">{t.margemKg === null ? '—' : formatarNumero(t.margemKg, 3, 3)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -217,6 +217,7 @@ export function EditarEntrega() {
     if (!f.data) er.data = 'Indique a data';
     if (!f.setorId) er.setorId = 'Escolha o setor';
     if (num('kg') === null) er.kg = f.kg.trim() ? 'Número inválido' : 'Campo obrigatório';
+    else if (num('kg')! < 0) er.kg = 'Não pode ser negativo';
     for (const k of ['quebras', 'precoKg', 'receita'] as const) {
       if (f[k].trim() && (num(k) === null || num(k)! < 0)) er[k] = 'Número inválido';
     }
@@ -270,6 +271,7 @@ export function EditarEntrega() {
                 {listaSetores.map((s) => (
                   <option key={s.id} value={s.id}>{s.nome}</option>
                 ))}
+                {f.setorId && !listaSetores.some((s) => s.id === f.setorId) && <option value={f.setorId}>(setor apagado)</option>}
               </select>
             )}
           </Campo>

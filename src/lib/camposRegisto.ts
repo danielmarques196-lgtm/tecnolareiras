@@ -12,6 +12,8 @@ import { formParaObjeto, formVazio, objetoParaForm, validarForm, type DefCampo, 
 
 export type { DefCampo };
 
+export const UNIDADES_ADUBACAO = ['kg', 'L', 'kg/ha', 'L/ha', 'g', 't'] as const;
+
 export const CAMPOS: Record<TipoRegisto, DefCampo[]> = {
   tratamento: [
     { chave: 'produto', rotulo: 'Produto comercial', tipo: 'texto', obrigatorio: true },
@@ -30,7 +32,7 @@ export const CAMPOS: Record<TipoRegisto, DefCampo[]> = {
   adubacao: [
     { chave: 'produto', rotulo: 'Produto', tipo: 'texto', obrigatorio: true },
     { chave: 'quantidade', rotulo: 'Quantidade', tipo: 'numero', obrigatorio: true, grupo: 'qtd' },
-    { chave: 'unidade', rotulo: 'Unidade', tipo: 'opcoes', opcoes: ['kg', 'L', 'kg/ha', 'L/ha', 'g', 't'], grupo: 'qtd' },
+    { chave: 'unidade', rotulo: 'Unidade', tipo: 'opcoes', opcoes: UNIDADES_ADUBACAO, grupo: 'qtd' },
     { chave: 'modo', rotulo: 'Modo de aplicação', tipo: 'opcoes', opcoes: MODOS_ADUBACAO, obrigatorio: true },
   ],
   rega: [

@@ -18,20 +18,31 @@ de segurança em JSON), funciona offline no campo (PWA), interface em **portugu�
 ## Estrutura de pastas
 ```
 src/
-  main.tsx            arranque, registo do service worker
-  App.tsx             layout + rotas
-  estilos.css         estilos globais e temas
+  main.tsx              arranque, registo do service worker
+  App.tsx               layout + rotas (HashRouter)
+  estilos.css           estilos globais, temas, impressão
   dados/
-    modelo.ts         tipos de dados (Setor, Registo, ...)
-    bd.ts             esquema Dexie (versões) — só repositorio.ts e backup.ts o importam
-    repositorio.ts    ÚNICA porta de acesso aos dados (CRUD, definições, seed, backup)
-    backup.ts         exportar/importar JSON (formato versionado)
-    seed.ts           dados iniciais, aplicados uma vez cada (passos numerados)
-  lib/                lógica pura e testável (formatos, datas, cálculos, CSV)
-  componentes/        componentes reutilizáveis (Navegacao, Confirmar, Aviso…)
-  paginas/            uma página por módulo (Resumo, Registos, EditarRegisto, RegistoTratamentos, Setores, SoloAgua, Vendas, Clima, Definicoes)
-public/               ícones da PWA
-dados/                CSV a importar da app anterior (opcional, não versionado se tiver dados pessoais)
+    modelo.ts           tipos de dados (Setor, Registo, AnaliseSolo/Agua, Entrega, …)
+    bd.ts               esquema Dexie — só repositorio.ts e backup.ts o importam
+    repositorio.ts      ÚNICA porta de acesso aos dados (CRUD, definições, importação, useConsulta)
+    backup.ts           exportar/importar cópia JSON (formato versionado)
+    seed.ts             dados iniciais em passos numerados (1: Setor 4+7 e furos; 2: análises)
+  lib/                  lógica pura e testada (*.test.ts ao lado)
+    formatos.ts         datas dd/mm/aaaa, números pt-PT
+    formulario.ts       formulários genéricos (definição de campos, texto ↔ valores)
+    camposRegisto.ts    campos de cada tipo de registo
+    registos.ts         filtros, quantidade de produto, exportações CSV, registo de tratamentos
+    intervaloSeguranca.ts  data de colheita permitida e IS a decorrer por setor
+    campanha.ts         indicadores da campanha
+    analises.ts         análises de solo/água, "<"/n.d., textura, pH, risco de entupimento
+    vendas.ts           receita, custos por setor, margem
+    clima.ts            Open-Meteo, previsão, ETo desde a última rega
+    importacao.ts       importação do CSV da app anterior
+    csv.ts, escala.ts, imagem.ts, lembrete.ts, setores.ts, descarregar.ts
+  componentes/          Navegacao, Confirmar, Campo, CamposFormulario, GraficoLinhas, LembreteCopia, Tema, Icone
+  paginas/              Resumo, Registos, EditarRegisto, RegistoTratamentos, Setores, SoloAgua, Vendas, Clima, Definicoes
+public/                 ícones da PWA
+dados/                  CSV da app anterior (não versionado) + LEIA-ME e exemplo
 ```
 
 ## Convenções
@@ -102,6 +113,14 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
   até hoje (inclusive); rega em «Toda a exploração» conta para todos os setores. Cartão só de março a outubro.
   Não se aplica Kc (mostra-se ETo de referência; 1 mm = 10 m³/ha).
 - **Testes no browser com Playwright**: usar `serviceWorkers: 'block'` para poder simular a Open-Meteo com `route`.
+- **Importação CSV** (`lib/importacao.ts`): só lê e prepara um plano (pré-visualização); `repositorio.importarRegistos`
+  grava numa transação. Tipos pelo nome (sem acentos/maiúsculas); setores em falta criados (sem repetir nomes);
+  duplicados detetados por assinatura (tipo, data, setor, custo, notas, dados). O CSV exportado volta a importar-se igual.
+  Unidades/modos/intensidades desconhecidos → valor por omissão + aviso. Separador `;` (ou `,`).
+- **Última cópia**: só é registada depois de o ficheiro ser descarregado (`marcarCopiaFeita`).
+- **Service worker**: não guarda a Open-Meteo em cache (um NetworkFirst devolveria dados antigos offline como novos);
+  a app guarda a resposta em IndexedDB com a data real.
+- **Publicação**: `netlify.toml` incluído; Cloudflare Pages com build `npm run build`, pasta `dist`, `NODE_VERSION=22`.
 - **Git**: commit + `git push -u origin master` no fim de cada etapa.
 - **Verificação manual**: `npm run build && npm run preview` e abrir no browser (o service worker só existe no build).
 
@@ -117,4 +136,4 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
 3. [x] Resumo da campanha, testes do intervalo de segurança
 4. [x] Solo e água, dados iniciais e gráficos
 5. [x] Vendas e Clima
-6. [ ] Importação CSV, revisão, build, README
+6. [x] Importação CSV, revisão, build, README

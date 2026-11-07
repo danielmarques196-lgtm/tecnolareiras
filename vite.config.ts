@@ -28,14 +28,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
-        runtimeCaching: [
-          {
-            // Open-Meteo: rede primeiro, cache como recurso offline (a app também guarda em IndexedDB)
-            urlPattern: /^https:\/\/api\.open-meteo\.com\//,
-            handler: 'NetworkFirst',
-            options: { cacheName: 'open-meteo', expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 14 } },
-          },
-        ],
+        // Open-Meteo sem cache no service worker: a app guarda a resposta em IndexedDB com a data real
+        // (um NetworkFirst devolveria dados antigos offline como se fossem novos).
       },
     }),
   ],

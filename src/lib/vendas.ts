@@ -24,6 +24,7 @@ export function custosPorSetor(registos: Registo[], setores: Setor[], ano: numbe
     const c = r.custo ?? 0;
     if (!c) continue;
     if (r.setorId === TODA_EXPLORACAO) {
+      if (!setores.length) continue; // sem setores: contado só no total
       for (const s of setores) {
         const parte = area > 0 ? (s.areaHa ?? 0) / area : 1 / setores.length;
         m.set(s.id, (m.get(s.id) ?? 0) + c * parte);
@@ -69,7 +70,8 @@ export function totaisCampanha(
 ): { porSetor: TotaisSetor[]; total: Totais; calibres: { calibre: string; kg: number }[] } {
   const doAnoE = doAno(entregas, ano);
   const custos = custosPorSetor(registos, setores, ano);
-  const ids = [...new Set([...setores.map((s) => s.id), ...doAnoE.map((e) => e.setorId)])];
+  // inclui setores apagados que ainda tenham custos ou entregas
+  const ids = [...new Set([...setores.map((s) => s.id), ...doAnoE.map((e) => e.setorId), ...custos.keys()])];
   const porSetor = ids.map((id) => {
     const es = doAnoE.filter((e) => e.setorId === id);
     const s = setores.find((x) => x.id === id);
@@ -92,7 +94,8 @@ export function totaisCampanha(
     quebras: soma('quebras'),
     kgLiquidos: soma('kgLiquidos'),
     receita: soma('receita'),
-    custos: soma('custos'),
+    // todos os custos do ano (inclui «Toda a exploração» mesmo sem setores)
+    custos: doAno(registos, ano).reduce((a, r) => a + (r.custo ?? 0), 0),
     areaHa: area || null,
   });
   const cal = new Map<string, number>();

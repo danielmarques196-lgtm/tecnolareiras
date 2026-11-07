@@ -46,3 +46,30 @@ describe('repositório', () => {
     expect((await registos.listar()).map((r) => r.data)).toEqual(['2026-03-01', '2026-02-01', '2026-01-01']);
   });
 });
+
+import { importarRegistos } from './repositorio';
+describe('importação', () => {
+  it('cria setores novos e liga os registos pelo nome', async () => {
+    await novoSetor('Setor 4+7');
+    const r = await importarRegistos(['Setor 1'], [
+      { tipo: 'rega', data: '2025-06-01', custo: null, notas: '', setorNome: 'Setor 1', dados: { volume: 5, duracao: null, h2o2: null } },
+      { tipo: 'rega', data: '2025-06-02', custo: null, notas: '', setorNome: 'setor 4+7', dados: { volume: 6, duracao: null, h2o2: null } },
+      { tipo: 'rega', data: '2025-06-03', custo: null, notas: '', setorNome: '', dados: { volume: 7, duracao: null, h2o2: null } },
+    ]);
+    expect(r).toEqual({ setores: 1, registos: 3 });
+    const ss = await setores.listar();
+    const nomes = Object.fromEntries(ss.map((s) => [s.id, s.nome]));
+    const lista = await registos.listar();
+    expect(lista.map((x) => (x.setorId === TODA_EXPLORACAO ? '*' : nomes[x.setorId]))).toEqual(['*', 'Setor 4+7', 'Setor 1']);
+  });
+});
+
+describe('importação repetida', () => {
+  it('não cria setores com o mesmo nome duas vezes', async () => {
+    const linha = { tipo: 'rega' as const, data: '2025-06-01', custo: null, notas: '', setorNome: 'Setor 9', dados: { volume: 5, duracao: null, h2o2: null } };
+    await importarRegistos(['Setor 9'], [linha]);
+    const r = await importarRegistos(['Setor 9'], [linha]);
+    expect(r.setores).toBe(0);
+    expect((await setores.listar()).filter((s) => s.nome === 'Setor 9')).toHaveLength(1);
+  });
+});

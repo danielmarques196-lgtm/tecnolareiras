@@ -1,7 +1,9 @@
-import { useRef, useState } from 'react';
-import { criarBackup, ErroBackup, importarBackupTexto, nomeFicheiroBackup } from '../dados/backup';
+import { useEffect, useRef, useState } from 'react';
+import { criarBackup, ErroBackup, importarBackupTexto, marcarCopiaFeita, nomeFicheiroBackup } from '../dados/backup';
 import type { Tema } from '../dados/modelo';
-import { definicoes, useConsulta } from '../dados/repositorio';
+import { NOMES_TIPO, type TipoRegisto } from '../dados/modelo';
+import { definicoes, importarRegistos, registos, setores, useConsulta } from '../dados/repositorio';
+import { analisarCsv, type PlanoImportacao } from '../lib/importacao';
 import Campo from '../componentes/Campo';
 import { useConfirmar } from '../componentes/Confirmar';
 import { descarregarFicheiro } from '../lib/descarregar';
@@ -30,6 +32,7 @@ export default function Definicoes() {
   async function exportar() {
     const b = await criarBackup();
     descarregarFicheiro(nomeFicheiroBackup(), JSON.stringify(b, null, 1), 'application/json');
+    await marcarCopiaFeita(b);
     setMensagem({ tipo: 'ok', texto: 'Cópia de segurança criada. Guarde o ficheiro num local seguro (ex. Google Drive, e-mail, PC).' });
   }
 
@@ -97,12 +100,14 @@ export default function Definicoes() {
         )}
       </div>
 
+      <ImportarCsv />
+
       <div className="cartao">
         <h2>Exploração</h2>
         <p className="texto-suave">Aparece no cabeçalho do registo de tratamentos.</p>
         <div className="linha-campos">
-          <CampoDefinicao chave="nomeExploracao" rotulo="Nome da exploração" valor={(defs.nomeExploracao as string) ?? 'Herdade da Coroa'} />
-          <CampoDefinicao chave="titular" rotulo="Titular (nome / NIF)" valor={(defs.titular as string) ?? ''} />
+          <CampoDefinicao key={`n-${(defs.nomeExploracao as string) ?? ''}`} chave="nomeExploracao" rotulo="Nome da exploração" valor={(defs.nomeExploracao as string) ?? 'Herdade da Coroa'} />
+          <CampoDefinicao key={`t-${(defs.titular as string) ?? ''}`} chave="titular" rotulo="Titular (nome / NIF)" valor={(defs.titular as string) ?? ''} />
         </div>
       </div>
 
@@ -149,6 +154,14 @@ function Localizacao({ atual }: { atual: LocalizacaoT | null }) {
   const [nome, setNome] = useState(atual ? atual.nome : 'Herdade da Coroa');
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null);
 
+  // volta a ler os valores guardados quando mudam fora deste cartão (ex.: repor uma cópia)
+  const guardado = JSON.stringify(atual);
+  useEffect(() => {
+    setLat(formatarNumero(l.latitude, 5));
+    setLon(formatarNumero(l.longitude, 5));
+    setNome(atual ? atual.nome : 'Herdade da Coroa');
+  }, [guardado]);
+
   async function gravar(latitude: number | null, longitude: number | null) {
     if (latitude === null || longitude === null || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
       setMsg({ tipo: 'erro', texto: 'Coordenadas inválidas. Ex.: latitude 39,236 e longitude -8,686.' });
@@ -190,6 +203,104 @@ function Localizacao({ atual }: { atual: LocalizacaoT | null }) {
         </button>
       </div>
       {msg && <p className={msg.tipo === 'ok' ? 'texto-ok' : 'texto-erro'}>{msg.texto}</p>}
+    </div>
+  );
+}
+
+/** Importação do CSV da app anterior, com pré-visualização. */
+function ImportarCsv() {
+  const ficheiro = useRef<HTMLInputElement>(null);
+  const [plano, setPlano] = useState<(PlanoImportacao & { nome: string }) | null>(null);
+  const [resultado, setResultado] = useState('');
+  const [aImportar, setAImportar] = useState(false);
+
+  async function ler(f: File) {
+    setResultado('');
+    const texto = await f.text();
+    const p = analisarCsv(texto, await setores.listar(), await registos.listar());
+    setPlano({ ...p, nome: f.name });
+  }
+
+  async function importar() {
+    if (!plano || aImportar) return;
+    setAImportar(true);
+    try {
+      const r = await importarRegistos(plano.setoresNovos, plano.registos);
+      setResultado(`Importados ${r.registos} registo(s)${r.setores ? ` e criados ${r.setores} setor(es)` : ''}.`);
+      setPlano(null);
+    } finally {
+      setAImportar(false);
+    }
+  }
+
+  return (
+    <div className="cartao">
+      <h2>Importar CSV da app anterior</h2>
+      <p className="texto-suave">
+        Mostra uma pré-visualização antes de gravar. Cria os setores que faltam; registos repetidos não são importados duas vezes.
+      </p>
+      <details className="texto-suave" style={{ marginBottom: 8 }}>
+        <summary>Colunas esperadas</summary>
+        <code className="quebrar">
+          data;tipo;setor;produto;substancia;apv;alvo;dose;unidade;calda;is;aplicador;equipamento;modo;volume;horas;h2o2;operacao;horasMO;intensidade;descricao;kg;destino;calibre;custo;notas
+        </code>
+      </details>
+      <div className="botoes">
+        <button type="button" className="botao secundario" onClick={() => ficheiro.current?.click()}>
+          Escolher ficheiro CSV
+        </button>
+        <input
+          ref={ficheiro}
+          type="file"
+          accept=".csv,text/csv"
+          hidden
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            e.target.value = '';
+            if (f) ler(f);
+          }}
+        />
+      </div>
+      {plano && (
+        <div className="previa-importacao" role="status">
+          <h3>«{plano.nome}»</h3>
+          {plano.registos.length > 0 ? (
+            <ul>
+              <li>
+                <strong>{plano.registos.length}</strong> registo(s) a importar:{' '}
+                {Object.entries(plano.porTipo)
+                  .map(([t, n]) => `${NOMES_TIPO[t as TipoRegisto]} (${n})`)
+                  .join(', ')}
+              </li>
+              {plano.setoresNovos.length > 0 && <li>Setores novos a criar: {plano.setoresNovos.join(', ')}</li>}
+            </ul>
+          ) : (
+            <p>Nada para importar.</p>
+          )}
+          {plano.duplicados > 0 && <p className="texto-suave">{plano.duplicados} registo(s) já existem e serão ignorados.</p>}
+          {[...plano.erros, ...plano.avisos].length > 0 && (
+            <details>
+              <summary className={plano.erros.length ? 'texto-erro' : 'texto-aviso'}>
+                {plano.erros.length} linha(s) ignorada(s), {plano.avisos.length} aviso(s)
+              </summary>
+              <ul className="texto-suave">
+                {[...plano.erros, ...plano.avisos].map((m, i) => (
+                  <li key={i}>{m}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          <div className="botoes">
+            <button type="button" className="botao" disabled={!plano.registos.length || aImportar} onClick={importar}>
+              {aImportar ? 'A importar…' : `Importar ${plano.registos.length} registo(s)`}
+            </button>
+            <button type="button" className="botao secundario" onClick={() => setPlano(null)}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+      {resultado && <p className="texto-ok">{resultado}</p>}
     </div>
   );
 }

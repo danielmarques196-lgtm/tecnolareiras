@@ -1,0 +1,7 @@
+data;tipo;setor;produto;substancia;apv;alvo;dose;unidade;calda;is;aplicador;equipamento;modo;volume;horas;h2o2;operacao;horasMO;intensidade;descricao;kg;destino;calibre;custo;notas
+15/01/2025;Operação cultural;Toda a exploração;;;;;;;;;;;;;;;poda;40;;Poda de frutificação;;;;320;EXEMPLO FICTÍCIO
+20/03/2025;Adubação / fertirrega;Setor 4+7;Nitrato de cálcio;;;;50;kg;;;;;fertirrega;;;;;;;;;;;31,50;EXEMPLO FICTÍCIO
+02/04/2025;Tratamento fitossanitário;Setor 4+7;Produto X;substância Y;0000;Antracnose;2,5;kg/ha;800;14;Aplicador Exemplo;Atomizador;;;;;;;;;;;;48,00;EXEMPLO FICTÍCIO
+10/06/2025;Rega;Setor 4+7;;;;;;;;;;;;85;4;1,5;;;;;;;;;EXEMPLO FICTÍCIO
+18/06/2025;Observação de pragas/doenças;Setor 4+7;;;;Afídeos;;;;;;;;;;;;;média;Focos nos rebentos novos;;;;;EXEMPLO FICTÍCIO
+25/09/2025;Colheita;Setor 4+7;;;;;;;;;;;;;;;;;;;9500;Central fruteira;A;;EXEMPLO FICTÍCIO

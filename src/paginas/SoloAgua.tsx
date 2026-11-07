@@ -350,6 +350,9 @@ export function EditarAnalise() {
                   {o.nome}
                 </option>
               ))}
+              {alvo && opcoes.length > 0 && !opcoes.some((o) => o.id === alvo) && (
+                <option value={alvo}>({eSolo ? 'setor apagado' : 'furo apagado'})</option>
+              )}
             </select>
           )}
         </Campo>

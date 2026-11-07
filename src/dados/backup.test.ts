@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { bd } from './bd';
-import { criarBackup, ErroBackup, importarBackupTexto, validarBackup } from './backup';
+import { criarBackup, ErroBackup, importarBackupTexto, marcarCopiaFeita, validarBackup } from './backup';
 import { definicoes, registos, setores } from './repositorio';
 import { inicializar, SETOR_INICIAL } from './seed';
 
@@ -41,6 +41,8 @@ describe('cópia de segurança', () => {
     });
     const copia = await criarBackup();
     const texto = JSON.stringify(copia);
+    expect(await definicoes.ler('ultimaCopia', null)).toBeNull(); // só depois de descarregar
+    await marcarCopiaFeita(copia);
     expect(await definicoes.ler('ultimaCopia', null)).toBe(copia.exportadoEm);
 
     // alterar os dados depois da cópia

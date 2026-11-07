@@ -90,6 +90,40 @@ export const definicoes = {
   },
 };
 
+/**
+ * Grava uma importação: cria os setores novos (cultura romãzeira) e os registos, numa só transação.
+ * `setorNome` '' = toda a exploração.
+ */
+export async function importarRegistos(
+  setoresNovos: string[],
+  lista: (Omit<Registo, keyof Base | 'setorId'> & { setorNome: string })[],
+): Promise<{ setores: number; registos: number }> {
+  return bd.transaction('rw', bd.setores, bd.registos, async () => {
+    const instante = agora();
+    const existentes = new Set((await bd.setores.toArray()).map((s) => s.nome.toLowerCase()));
+    let criados = 0;
+    for (const nome of setoresNovos) {
+      if (existentes.has(nome.toLowerCase())) continue;
+      existentes.add(nome.toLowerCase());
+      criados++;
+      await bd.setores.add({
+        id: novoId(), criadoEm: instante, atualizadoEm: instante, nome, areaHa: null, cultura: 'Romãzeira',
+        variedade: '', anoPlantacao: null, numArvores: null, compasso: '', notas: 'Criado na importação do CSV.',
+      });
+    }
+    const porNome = new Map((await bd.setores.toArray()).map((s) => [s.nome.toLowerCase(), s.id]));
+    const novos = lista.map(({ setorNome, ...r }) => ({
+      ...r,
+      id: novoId(),
+      criadoEm: instante,
+      atualizadoEm: instante,
+      setorId: setorNome ? (porNome.get(setorNome.toLowerCase()) ?? TODA_EXPLORACAO) : TODA_EXPLORACAO,
+    })) as Registo[];
+    await bd.registos.bulkAdd(novos);
+    return { setores: criados, registos: novos.length };
+  });
+}
+
 /** Nome do setor para mostrar (inclui "Toda a exploração"). */
 export function nomeSetor(id: string, lista: Setor[]): string {
   if (id === TODA_EXPLORACAO) return 'Toda a exploração';

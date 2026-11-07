@@ -12,17 +12,24 @@ export interface Backup {
   tabelas: Record<TabelaBackup, unknown[]>;
 }
 
-/** Junta todos os dados num objeto e regista a data da cópia. */
+/**
+ * Junta todos os dados num objeto. A própria cópia já leva `ultimaCopia` = data da cópia;
+ * na base de dados só se regista com `marcarCopiaFeita`, depois de o ficheiro ser descarregado.
+ */
 export async function criarBackup(): Promise<Backup> {
   const exportadoEm = new Date().toISOString();
-  // grava antes de ler, para a própria cópia já incluir a data da última cópia
-  await definicoes.gravar('ultimaCopia', exportadoEm);
   const tabelas = {} as Record<TabelaBackup, unknown[]>;
   await bd.transaction('r', TABELAS_BACKUP.map((t) => bd.table(t)), async () => {
     for (const t of TABELAS_BACKUP) tabelas[t] = await bd.table(t).toArray();
   });
+  tabelas.definicoes = [
+    ...(tabelas.definicoes as { chave: string }[]).filter((d) => d.chave !== 'ultimaCopia'),
+    { chave: 'ultimaCopia', valor: exportadoEm },
+  ];
   return { formato: FORMATO_BACKUP, versao: VERSAO_BACKUP, exportadoEm, tabelas };
 }
+
+export const marcarCopiaFeita = (b: Backup) => definicoes.gravar('ultimaCopia', b.exportadoEm);
 
 export class ErroBackup extends Error {}
 

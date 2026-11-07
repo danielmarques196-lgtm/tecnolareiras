@@ -853,3 +853,22 @@ details.cartao[open] > summary {
   font-size: 0.9rem;
   font-weight: 400;
 }
+.previa-importacao {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--raio);
+  background: var(--superficie-2);
+}
+.previa-importacao ul {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+.quebrar {
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}
+/* nenhum texto comprido pode alargar a página no telemóvel */
+.conteudo {
+  min-width: 0;
+  overflow-wrap: break-word;
+}

@@ -55,3 +55,17 @@ describe('custos e margem', () => {
     expect(calibres).toEqual([{ calibre: 'A', kg: 7800 }, { calibre: 'B', kg: 3500 }]);
   });
 });
+
+describe('regressões', () => {
+  it('custos de um setor apagado continuam na margem total', () => {
+    const setores = [setor('a', 2)];
+    const regs = [custo('1', '2026-02-01', 'a', 100), custo('2', '2026-02-02', 'apagado', 500)];
+    const { porSetor, total } = totaisCampanha([entrega('e', '2026-09-01', 'a', 1000, 0, 1)], regs, setores, 2026);
+    expect(total.custos).toBe(600);
+    expect(total.margem).toBe(400);
+    expect(porSetor.map((t) => t.setorId).sort()).toEqual(['a', 'apagado']);
+  });
+  it('custos de toda a exploração contam mesmo sem setores', () => {
+    expect(totaisCampanha([], [custo('1', '2026-02-01', TODA_EXPLORACAO, 250)], [], 2026).total.custos).toBe(250);
+  });
+});
