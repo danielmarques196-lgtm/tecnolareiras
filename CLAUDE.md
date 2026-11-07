@@ -93,6 +93,15 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
   e salinidade CE (Ayers & Westcot, FAO 29). Não interpretamos P/K/MO (as classes dependem do método do laboratório).
 - **Gráficos**: SVG próprio (`componentes/GraficoLinhas.tsx`, `lib/escala.ts`), sem biblioteca. Cores das séries
   `--serie-1` (azul) e `--serie-2` (laranja), validadas para daltonismo e contraste nos dois temas.
+- **Vendas**: receita por omissão = (kg entregues − quebras) × €/kg; pode ser escrita à mão (fica guardada, `receita` ≠ null).
+  Margem = receita − custos lançados no caderno de campo; custos de «Toda a exploração» repartidos pela área dos setores.
+  Margem/kg usa kg vendidos (entregues − quebras).
+- **Clima**: Open-Meteo `/v1/forecast` com `past_days=92` (para a ETo desde a última rega) e 8 dias de previsão.
+  Resposta guardada na tabela `clima` (cache offline); atualiza sozinho se a cache tiver > 3 h ou mudar a localização.
+  Localização nas Definições (predefinição: Santarém, com aviso). ETo acumulada = soma dos dias depois da última rega
+  até hoje (inclusive); rega em «Toda a exploração» conta para todos os setores. Cartão só de março a outubro.
+  Não se aplica Kc (mostra-se ETo de referência; 1 mm = 10 m³/ha).
+- **Testes no browser com Playwright**: usar `serviceWorkers: 'block'` para poder simular a Open-Meteo com `route`.
 - **Git**: commit + `git push -u origin master` no fim de cada etapa.
 - **Verificação manual**: `npm run build && npm run preview` e abrir no browser (o service worker só existe no build).
 
@@ -107,5 +116,5 @@ dados/                CSV a importar da app anterior (opcional, não versionado 
 2. [x] Setores e Caderno de campo, com testes
 3. [x] Resumo da campanha, testes do intervalo de segurança
 4. [x] Solo e água, dados iniciais e gráficos
-5. [ ] Vendas e Clima
+5. [x] Vendas e Clima
 6. [ ] Importação CSV, revisão, build, README

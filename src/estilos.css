@@ -462,6 +462,7 @@ th {
 td.num,
 th.num {
   text-align: right;
+  white-space: nowrap;
 }
 
 /* ---------- Diálogo ---------- */
@@ -832,4 +833,23 @@ details.cartao[open] > summary {
   margin: 0;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+.linha-calibre {
+  display: grid;
+  grid-template-columns: 1fr 110px 48px;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.linha-calibre .botao {
+  padding: 0;
+}
+.valor-destaque {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin: 2px 0;
+}
+.valor-destaque .texto-suave {
+  font-size: 0.9rem;
+  font-weight: 400;
 }
