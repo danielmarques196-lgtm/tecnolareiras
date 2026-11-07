@@ -1,0 +1,7 @@
+node_modules
+dist
+dev-dist
+*.log
+.DS_Store
+# CSV com dados pessoais da app anterior não vai para o repositório
+dados/*.csv
