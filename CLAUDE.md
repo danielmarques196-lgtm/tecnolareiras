@@ -120,7 +120,9 @@ dados/                  CSV da app anterior (não versionado) + LEIA-ME e exempl
 - **Última cópia**: só é registada depois de o ficheiro ser descarregado (`marcarCopiaFeita`).
 - **Service worker**: não guarda a Open-Meteo em cache (um NetworkFirst devolveria dados antigos offline como novos);
   a app guarda a resposta em IndexedDB com a data real.
-- **Publicação**: `netlify.toml` incluído; Cloudflare Pages com build `npm run build`, pasta `dist`, `NODE_VERSION=22`.
+- **Publicação**: GitHub Pages em https://danielmarques196-lgtm.github.io/tecnolareiras/ (workflow `.github/workflows/publicar.yml`
+  publica `dist/` no ramo `gh-pages` a cada push para master; `base: './'` + HashRouter funcionam no subcaminho).
+  Alternativas: `netlify.toml` incluído; Cloudflare Pages com build `npm run build`, pasta `dist`, `NODE_VERSION=22`.
 - **Git**: commit + `git push -u origin master` no fim de cada etapa.
 - **Verificação manual**: `npm run build && npm run preview` e abrir no browser (o service worker só existe no build).
 

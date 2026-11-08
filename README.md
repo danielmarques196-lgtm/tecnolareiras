@@ -53,7 +53,18 @@ npm run preview      # experimentar a versão final (com modo offline) em http:/
 A app é um site estático (a pasta `dist/`). Os teus dados **não** vão para o servidor: quem abrir o endereço vê uma
 app vazia, e cada dispositivo guarda os seus próprios dados.
 
-### Opção A: Netlify (a mais simples)
+### Opção A: GitHub Pages (já configurado neste repositório)
+
+Endereço: **<https://danielmarques196-lgtm.github.io/tecnolareiras/>**
+
+A cada `git push` para `master`, o GitHub Actions (`.github/workflows/publicar.yml`) corre os testes, gera a app e
+publica-a no ramo `gh-pages`. Ao fim de 1 a 2 minutos o endereço tem a versão nova. Para acompanhar, vê o separador
+**Actions** do repositório.
+
+Se o endereço der erro 404 da primeira vez: no GitHub, vai a **Settings → Pages**. Em *Build and deployment*,
+escolhe **Source: Deploy from a branch**, **Branch: `gh-pages`**, pasta **`/ (root)`** e carrega em **Save**.
+
+### Opção B: Netlify
 
 **Sem ligar ao GitHub (arrastar e largar):**
 1. Corre `npm run build`.
@@ -65,7 +76,7 @@ app vazia, e cada dispositivo guarda os seus próprios dados.
 1. Em <https://app.netlify.com>: **Add new site → Import an existing project → GitHub** e escolhe este repositório.
 2. As definições já estão no `netlify.toml` (build `npm run build`, pasta `dist`). Carrega em **Deploy**.
 
-### Opção B: Cloudflare Pages
+### Opção C: Cloudflare Pages
 1. Em <https://dash.cloudflare.com>: **Workers & Pages → Create → Pages → Connect to Git** e escolhe este repositório.
 2. Framework preset: **Vite** (ou *None*). Build command: `npm run build`. Build output directory: `dist`.
 3. Em **Environment variables**, junta `NODE_VERSION` = `22`. Carrega em **Save and Deploy**.
